@@ -452,9 +452,28 @@ def _calc_ice_lines_inter(data_chunk, model, classifier, model_features, n_class
 	#ice_chunk.drop(ice_chunk.columns.values, axis=1, inplace=True)
 	#data_chunk.drop(data_chunk.columns.values, axis=1, inplace=True)
 
+def _get_axes(ax=None, figsize=None):
+        if ax is None:
+
+		if figsize is None:
+			plt.figure(figsize=(16, 9))
+		else:
+			plt.figure(figsize=figsize)
+
+                gs = GridSpec(5, 1)
+		ax1 = plt.subplot(gs[0, :])
+		ax2 = plt.subplot(gs[1:, :])
+
+        else:
+                ax_bbox_points = ax.get_position().get_points()
+                width, height = ax_bbox_points[1,:] - ax_bbox_points[0,:]
+                ax1 = plt.axes( (ax_bbox_points[0] + [0, 0.8*height]).tolist() + [width, 0.2*height] )
+                ax2 = plt.axes( ax_bbox_points[0].tolist() + [width, 0.8*height] )
+
+        return ax1, ax2
 
 def pdp_plot(pdp_isolate_out, feature_name, center=True, plot_org_pts=False, plot_lines=False, frac_to_plot=1, cluster=False, n_cluster_centers=None, 
-	cluster_method=None, x_quantile=False, figsize=None, ncols=None, plot_params=None, multi_flag=False, which_class=None):
+	     cluster_method=None, x_quantile=False, figsize=None, ncols=None, plot_params=None, multi_flag=False, which_class=None, ax=None):
 	'''
 	pdp_isolate_out: instance of pdp_isolate_obj
 		a calculated pdp_isolate_obj instance
@@ -609,20 +628,17 @@ def pdp_plot(pdp_isolate_out, feature_name, center=True, plot_org_pts=False, plo
 					plot_org_pts=plot_org_pts, plot_lines=plot_lines, frac_to_plot=frac_to_plot, cluster=cluster, n_cluster_centers=n_cluster_centers, 
 					cluster_method=cluster_method, x_quantile=x_quantile, ax=ax2, plot_params=plot_params)
 	else:
-		if figsize is None:
-			plt.figure(figsize=(16, 9))
-		else:
-			plt.figure(figsize=figsize)
-			
-		gs = GridSpec(5, 1)
-		ax1 = plt.subplot(gs[0, :])
-		_pdp_plot_title(pdp_isolate_out=pdp_isolate_out, feature_name=feature_name, ax=ax1, figsize=figsize, multi_flag=False, which_class=None, 
-			plot_params=plot_params)
 
-		ax2 = plt.subplot(gs[1:, :])
+                ax1, ax2 = _get_axes(ax, figsize)
+
+	        _pdp_plot_title(pdp_isolate_out=pdp_isolate_out, feature_name=feature_name, ax=ax1, figsize=figsize, multi_flag=False, which_class=None, 
+			plot_params=plot_params)
+                
 		_pdp_plot(pdp_isolate_out=pdp_isolate_out, feature_name=feature_name, center=center, plot_org_pts=plot_org_pts, plot_lines=plot_lines, 
 			frac_to_plot=frac_to_plot, cluster=cluster, n_cluster_centers=n_cluster_centers, cluster_method=cluster_method, x_quantile=x_quantile, 
 			ax=ax2, plot_params=plot_params)
+
+	return ax1, ax2
 
 
 def _pdp_plot_title(pdp_isolate_out, feature_name, ax, figsize, multi_flag, which_class, plot_params):
@@ -1719,5 +1735,3 @@ def _target_plot_title(feature_name, ax, figsize, plot_params):
 	ax.text(0, 0.7, title, va="top", ha="left", fontsize=title_fontsize, fontname=font_family)
 	ax.text(0, 0.4, subtitle, va="top", ha="left", fontsize=subtitle_fontsize, fontname=font_family, color='grey')
 	ax.axis('off')
-
-
