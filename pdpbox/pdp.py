@@ -217,11 +217,11 @@ def _get_grids(x, num_grid_points, percentile_range):
 		grids = np.unique(x)
 	else:
 		if percentile_range is not None:
-			grids = np.unique(np.percentile(x, np.linspace(np.min(percentile_range), np.max(percentile_range), num_grid_points)))
+			grids = np.percentile(x, np.linspace(np.min(percentile_range), np.max(percentile_range), num_grid_points))
 		else:
-			grids = np.unique(np.percentile(x, np.linspace(0, 100, num_grid_points)))
+			grids = np.percentile(x, np.linspace(0, 100, num_grid_points))
 			
-	return np.array([round(val, 2) for val in grids])
+	return np.unique(np.array([round(val, 2) for val in grids]))
 
 
 def _make_ice_data(data, feature, feature_type, feature_grids):
@@ -659,6 +659,8 @@ def _pdp_plot_title(pdp_isolate_out, feature_name, ax, figsize, multi_flag, whic
 			font_family = plot_params['font_family']
 		if 'title' in plot_params.keys():
 			title = plot_params['title']
+		if 'subtitle' in plot_params.keys():
+			subtitle = plot_params['subtitle']
 		if 'title_fontsize' in plot_params.keys():
 			title_fontsize = plot_params['title_fontsize']
 		if 'subtitle_fontsize' in plot_params.keys():
